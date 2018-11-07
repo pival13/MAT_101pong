@@ -2,25 +2,24 @@
 ** EPITECH PROJECT, 2018
 ** my_getnbr.c
 ** File description:
-** Function that returns a number sent as a string.
+** str to int
 */
 
-#include "../../include/my.h"
-#include <stdlib.h>
-
-char *my_getnbr(int nbr)
+int my_getnbr(char *toconvert)
 {
-    char *str = malloc(sizeof(char) * 14);
-    int reste = 0;
+    int number = 0;
+    int mult = 1;
     int i = 0;
+    int negative = 0;
 
-    while (nbr != 0) {
-        reste = nbr % 10;
-        str[i] = reste + 48;
-        nbr -= reste;
-        nbr = nbr / 10;
-        i++;
+    if (toconvert[0] == '-') {
+        toconvert++;
+        negative = 1;
     }
-    my_revstr(str);
-    return (str);
+    for (i = 0; toconvert[i] != 0; i++);
+    for (i--; i >= 0; i--, mult *= 10)
+        number += (toconvert[i] - 48) * mult;
+    if (negative == 1)
+        number *= (-1);
+    return (number);
 }

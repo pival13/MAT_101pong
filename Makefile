@@ -7,7 +7,8 @@
 
 CC	 =	gcc
 
-SRC	=	main.c 		
+SRC	=	main.c 		\
+		101pong.c
 
 OBJ	=	$(SRC:.c=.o)
 
@@ -17,7 +18,7 @@ all: $(NAME)
 
 $(NAME):
 	make -C./lib/my
-	$(CC) -g -o $(NAME) $(SRC) -L./lib/my -lmy -I./include/
+	$(CC) -g -o $(NAME) $(SRC) -lm -L./lib/my -lmy -I./include/
 
 clean:
 	make clean -C./lib/my

@@ -2,7 +2,7 @@
 ## EPITECH PROJECT, 2018
 ## Makefile
 ## File description:
-##
+## lib makefile
 ##
 
 SRC	=	my_putstr.c				\
@@ -40,10 +40,11 @@ SRC	=	my_putstr.c				\
 		multiplication2.c	\
 		infin_sub.c		\
 		infin_div.c		\
-		infin_modulo.c	\
-		my_erasestr.c	\
+		infin_modulo.c		\
+		my_erasestr.c		\
 		str_add.c		\
-		my_getfloat.c
+		my_getfloat.c		\
+		my_get_strtonbr.c
 
 OBJ	=	$(SRC:.c=.o)
 

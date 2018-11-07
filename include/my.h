@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <string.h>
 
+int my_getnbr(char *);
+
 float my_getfloat2(char *toconvert, int point_pos, float number, int mult);
 
 float my_getfloat(char *toconvert);
@@ -22,7 +24,7 @@ char *my_erasestr(char *str);
 
 int my_compute_square_root(int nb);
 
-char *my_getnbr(int nbr);
+char *my_get_strtonbr(int nbr);
 
 int my_is_prime(int nb);
 
