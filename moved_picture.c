@@ -7,6 +7,7 @@
 
 #include <SFML/Graphics.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct framebuffer {
     unsigned int width;
@@ -38,7 +39,7 @@ void put_pixel(framebuffer_t *framebuffer, unsigned int x, unsigned int y, sfCol
     framebuffer->pixel[((framebuffer->width) * (y - 1) + x - 1) * 4 + 3] = alpha;
 }
 
-void draw_square(framebuffer_t *framebuffer, sfVector2f position, unsigned int width, unsigned int height, sfColor color)
+void draw_square(framebuffer_t *framebuffer, sfVector2f position, unsigned int width, unsigned int height, sfColor color, sfColor color2)
 {
     int x = position.x;
     int y = position.y;
@@ -51,6 +52,8 @@ void draw_square(framebuffer_t *framebuffer, sfVector2f position, unsigned int w
             put_pixel(framebuffer, x, y + i, color);
         for (int i = 0; i != height; i++) {
             put_pixel(framebuffer, x + 1 + i, y, color);
+            for (int j = 1; j != width - 1; j++)
+                put_pixel(framebuffer, x + 1 + i, y + j, color2);
             put_pixel(framebuffer, x + 1 + i, y + width - 1, color);
         }
         for (int i = 0; i != width; i++)
@@ -71,23 +74,42 @@ int main(int n, char **arg)
     sfVector2f move = {event.mouseMove.x, 921};
     sfVector2f origin_ball = {15, 15};
     sfVector2f origin_bat = {120, 0};
-    sfVector2f scale = {0.06, 0.06};
+    sfVector2f scale = {0.2, 0.2};
     sfVector2f position = {event.mouseMove.x, 469};
     int sens_x = 0;
     int sens_y = 1;
     int begin = 0;
     float x = 0.6;
     float y = 0.5;
+    float mult = 1.0001;
+    int compteur = 0;
+    sfColor color = {50, 50, 50, 100};
 
+    if (n != 2) {
+        my_putstr("Please enter a difficulty (Easy, Hard)\n");
+        return (84);
+    }
     sfCircleShape_setRadius(circle, 15);
     sfCircleShape_setOutlineColor(circle, sfBlack);
     sfCircleShape_setFillColor(circle, sfYellow);
     sfCircleShape_setOutlineThickness(circle, 1);
     sfCircleShape_setOrigin(circle, origin_ball);
     sfSprite_setOrigin(bat, origin_bat);
-    draw_square(fb, position, 30, 150, sfBlack);
+    draw_square(fb, position, 30, 150, sfBlack, sfBlue);
     sfTexture_updateFromPixels(t_bat, fb->pixel, 1915, 967, 0, 0);
     sfSprite_setTexture(bat, t_bat, sfFalse);
+    if (my_strcmp(arg[1], "Easy") == 0)
+        mult = 1.00001;
+    else if (my_strcmp(arg[1], "Hard") == 0)
+        mult = 1.0001;
+    else if (my_strcmp(arg[1], "Lunatic") == 0) {
+        sfCircleShape_setFillColor(circle, sfWhite);
+        mult += 0.0002;
+    }
+    else {
+        my_putstr("Please enter a difficulty (Easy, Hard)\n");
+        return (84);
+    }
     while (sfRenderWindow_isOpen(window)) {
         sfRenderWindow_clear(window, sfWhite);
         sfCircleShape_setPosition(circle, move);
@@ -98,13 +120,13 @@ int main(int n, char **arg)
         if (begin == 1) {
             (sens_x == 0) ? (move.x += x) : (move.x -= x);
             (sens_y == 0) ? (move.y += y) : (move.y -= y);
-            (move.y > 967 - 14 - 30 && position.x > move.x - 75 && position.x < move.x + 75) ? (sens_y = 1) : sens_y;
-            (move.y > 967 - 14) ? (move.x = event.mouseMove.x, move.y = 920, begin = 0, sens_y = 1) : move.x;
+            (move.y > 967 - 14 - 30 && position.x > move.x - 75 && position.x < move.x + 75) ? (sens_y = 1, compteur++) : sens_y;
+            (move.y > 967 - 14) ? (sfRenderWindow_close(window)) : move.x;
             (move.y < 14) ? (sens_y = 0) : sens_y;
             (move.x < 14) ? (sens_x = 0) : sens_x;
             (move.x > 1915 - 14) ? (sens_x = 1) : sens_x;
-            x *= 1.00001;
-            y *= 1.00001;
+            x *= mult;
+            y *= mult;
         } else {
             move.x = event.mouseMove.x;
             x = 0.6;
@@ -115,9 +137,9 @@ int main(int n, char **arg)
                 sfRenderWindow_close(window);
             if (event.type == sfEvtKeyPressed)
                 if (event.key.code == sfKeyRight)
-                    position.x += 15;
+                    position.x += 25;
                 else if (event.key.code == sfKeyLeft)
-                    position.x -= 15;
+                    position.x -= 25;
             if (event.type == sfEvtMouseMoved)
                 if (event.mouseMove.x > 1835)
                     position.x = 1835;
@@ -135,5 +157,6 @@ int main(int n, char **arg)
     sfTexture_destroy(t_bat);
     sfSprite_destroy(bat);
     sfRenderWindow_destroy(window);
+    printf("Vous avez effectué %d rebonds.\n", compteur);
     return (0);
 }
