@@ -8,6 +8,7 @@
 #include <SFML/Graphics.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "include/my.h"
 
 typedef struct framebuffer {
     unsigned int width;
@@ -69,12 +70,16 @@ int main(int n, char **arg)
     sfEvent event;
     framebuffer_t *fb = framebuffer_create(1915, 967);
     sfCircleShape *circle = sfCircleShape_create();
+    sfCircleShape *circle2 = sfCircleShape_create();
+    sfTexture *wall = sfTexture_createFromFile("brique.jpg", NULL);
+    sfSprite *background = sfSprite_create();
     sfTexture *t_bat = sfTexture_create(1915, 967);
     sfSprite *bat = sfSprite_create();
     sfVector2f move = {event.mouseMove.x, 921};
     sfVector2f origin_ball = {15, 15};
-    sfVector2f origin_bat = {120, 0};
-    sfVector2f scale = {0.2, 0.2};
+    sfVector2f origin_ball2 = {10, 0};
+    sfVector2f origin_bat = {73, 0};
+    sfVector2f scale = {2.82, 2.82};
     sfVector2f position = {event.mouseMove.x, 469};
     int sens_x = 0;
     int sens_y = 1;
@@ -83,39 +88,48 @@ int main(int n, char **arg)
     float y = 0.5;
     float mult = 1.0001;
     int compteur = 0;
-    sfColor color = {50, 50, 50, 100};
+    sfColor color = {200, 200, 200, 100};
 
     if (n != 2) {
-        my_putstr("Please enter a difficulty (Easy, Hard)\n");
+        my_putstr("Please enter a difficulty (Easy, Hard, Lunatic)\n");
         return (84);
     }
     sfCircleShape_setRadius(circle, 15);
+    sfCircleShape_setRadius(circle2, 4);
     sfCircleShape_setOutlineColor(circle, sfBlack);
     sfCircleShape_setFillColor(circle, sfYellow);
+    sfCircleShape_setFillColor(circle2, sfWhite);
     sfCircleShape_setOutlineThickness(circle, 1);
     sfCircleShape_setOrigin(circle, origin_ball);
+    sfCircleShape_setOrigin(circle2, origin_ball2);
     sfSprite_setOrigin(bat, origin_bat);
     draw_square(fb, position, 30, 150, sfBlack, sfBlue);
     sfTexture_updateFromPixels(t_bat, fb->pixel, 1915, 967, 0, 0);
     sfSprite_setTexture(bat, t_bat, sfFalse);
+    sfSprite_setTexture(background, wall, sfFalse);
+    sfSprite_scale(background, scale);
     if (my_strcmp(arg[1], "Easy") == 0)
         mult = 1.00001;
     else if (my_strcmp(arg[1], "Hard") == 0)
         mult = 1.0001;
     else if (my_strcmp(arg[1], "Lunatic") == 0) {
-        sfCircleShape_setFillColor(circle, sfWhite);
+        sfCircleShape_setFillColor(circle, color);
         mult += 0.0002;
     }
     else {
-        my_putstr("Please enter a difficulty (Easy, Hard)\n");
+        my_putstr("Please enter a difficulty (Easy, Hard, Lunatic)\n");
         return (84);
     }
+    //sfRenderWindow_setMouseCursorVisible(window, sfFalse);
     while (sfRenderWindow_isOpen(window)) {
-        sfRenderWindow_clear(window, sfWhite);
+        sfRenderWindow_clear(window, color);
+        sfRenderWindow_drawSprite(window, background, NULL);
         sfCircleShape_setPosition(circle, move);
+        sfCircleShape_setPosition(circle2, move);
         sfSprite_setPosition(bat, position);
         sfRenderWindow_drawSprite(window, bat, NULL);
         sfRenderWindow_drawCircleShape(window, circle, NULL);
+        sfRenderWindow_drawCircleShape(window, circle2, NULL);
         sfRenderWindow_display(window);
         if (begin == 1) {
             (sens_x == 0) ? (move.x += x) : (move.x -= x);
