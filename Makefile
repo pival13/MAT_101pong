@@ -19,6 +19,7 @@ all: $(NAME)
 $(NAME):
 	make -C./lib/my
 	$(CC) -g -o $(NAME) $(SRC) -lm -L./lib/my -lmy -I./include/
+	$(CC) -o game bonus/moved_picture.c -lcsfml-graphics -Llib/my -lmy -Iinclude
 
 clean:
 	make clean -C./lib/my
@@ -26,7 +27,7 @@ clean:
 
 fclean: clean
 	make fclean -C./lib/my
-	rm -f $(NAME)
+	rm -f $(NAME) game
 
 re:	fclean all
 
