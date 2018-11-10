@@ -17,7 +17,7 @@ NAME	=	101pong
 all: $(NAME)
 
 $(NAME):
-	make -C./lib/my
+	make -C./lib/my && make clean -C./lib/my
 	$(CC) -g -o $(NAME) $(SRC) -lm -L./lib/my -lmy -I./include/
 	$(CC) -o game bonus/moved_picture.c -lcsfml-graphics -Llib/my -lmy -Iinclude
 
