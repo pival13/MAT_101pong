@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2018
-** open_window
+** breakout_c
 ** File description:
-** open a window of 800x600
+** A breakout game in C
 */
 
 #include <SFML/Graphics.h>
@@ -73,23 +73,41 @@ sfCircleShape *draw_circle(int radius)
     return (circle);
 }
 
-sfTexture *make_brique(void)
+sfTexture *make_brique(int pos_brique[12][2])
 {
     framebuffer_t *fb2 = framebuffer_create(193, 51);
-    sfTexture *brique = sfTexture_create(1915, 51);
+    sfTexture *brique = sfTexture_create(1915, 251);
     
     draw_square(fb2, 1, 1, 50, 192, sfBlack, sfRed);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 0, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 192, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 384, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 576, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 768, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 960, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 1152, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 1342, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 1531, 0);
-    sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, 1720, 0);
+    for (int i = 0; i != 12; i++)
+        sfTexture_updateFromPixels(brique, fb2->pixel, 193, 51, pos_brique[i][0], pos_brique[i][1]);
     return (brique);
+}
+
+sfColor change_color(sfColor color, int c_color)
+{
+    (color.r == 255 && color.g < 255 && color.b == 0 && c_color == 1) ? color.g++ : color.g;
+    (color.r > 0 && color.g == 255 && color.b == 0 && c_color == 1) ? color.r-- : color.r;
+    (color.r == 0 && color.g == 255 && color.b < 255 && c_color == 1) ? color.b++ : color.b;
+    (color.r == 0 && color.g > 0 && color.b == 255 && c_color == 1) ? color.g-- : color.g;
+    (color.r < 255 && color.g == 0 && color.b == 255 && c_color == 1) ? color.r++ : color.r;
+    (color.r == 255 && color.g == 0 && color.b > 0 && c_color == 1) ? color.b-- : color.b;
+    return (color);
+}
+
+void touch_brique(sfVector2f move, sfTexture *texture, int *brique, int *sens, int n_brique, int pos_brique[12][2])
+{
+    framebuffer_t *fb = framebuffer_create(193, 51);
+
+    if (brique[n_brique] == 0) {
+        draw_square(fb, 1, 1, 50, 192, sfTransparent, sfTransparent);
+        (move.y < 14 + 50 + pos_brique[n_brique][1] && move.y > 14 + 50 + pos_brique[n_brique][1] - 5 && move.x > pos_brique[n_brique][0] - 14 && move.x < pos_brique[n_brique][0] + 14 + 192 && brique[n_brique] == 0) ? (sfTexture_updateFromPixels(texture, fb->pixel, 193, 51, pos_brique[n_brique][0], pos_brique[n_brique][1]), brique[n_brique] = 1, sens[1] = -1) : sens[1];
+        (move.y < pos_brique[n_brique][1] + 5 - 14 && move.y > pos_brique[n_brique][1] - 14 && move.x > pos_brique[n_brique][0] - 14 && move.x < pos_brique[n_brique][0] + 192 + 14 && brique[n_brique] == 0) ? (sfTexture_updateFromPixels(texture, fb->pixel, 193, 51, pos_brique[n_brique][0], pos_brique[n_brique][1]), brique[n_brique] = 1, sens[1] = 1) : sens[1];
+        (move.y < 50 + pos_brique[n_brique][1] + 14 && move.y > pos_brique[n_brique][1] - 14 && move.x > pos_brique[n_brique][0] - 14 && move.x < pos_brique[n_brique][0] + 5 - 14 && brique[n_brique] == 0) ? (sfTexture_updateFromPixels(texture, fb->pixel, 193, 51, pos_brique[n_brique][0], pos_brique[n_brique][1]), brique[n_brique] = 1, sens[0] = 1) : sens[0];
+        (move.y < 50 + pos_brique[n_brique][1] + 14 && move.y > pos_brique[n_brique][1] - 14 && move.x > pos_brique[n_brique][0] + 192 + 14 - 5 && move.x < pos_brique[n_brique][0] + 192 + 14 && brique[n_brique] == 0) ? (sfTexture_updateFromPixels(texture, fb->pixel, 193, 51, pos_brique[n_brique][0], pos_brique[n_brique][1]), brique[n_brique] = 1, sens[0] = -1) : sens[0];
+    }
+    free(fb->pixel);
+    free(fb);
 }
 
 int main(int n, char **arg)
@@ -104,23 +122,25 @@ int main(int n, char **arg)
     sfTexture *wall = sfTexture_createFromFile("bonus/brique.jpg", NULL);
     sfSprite *background = sfSprite_create();
     sfSprite *wall_brique = sfSprite_create();
-    sfTexture *texture = make_brique();
     sfTexture *t_bat = sfTexture_create(171, 31);
     sfSprite *bat = sfSprite_create();
-    sfVector2f move = {400, 921};
+    sfVector2f move = {200, 921};
     sfVector2f origin_ball2 = {10, 0};
     sfVector2f origin_bat = {83, 0};
     sfVector2f scale = {2.82, 2.82};
     sfVector2f position = {950, 937};
-    int sens_x = 0;
-    int sens_y = 1;
+    int sens[2] = {-1, 1};
     int begin = 0;
-    int brique[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int brique[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int pos_brique[12][2] = {{0, 0}, {192, 0}, {384, 0}, {576, 0}, {768, 0}, {960, 0}, {1152, 0}, {1342, 0}, {1531, 0}, {1720, 0}, {1152, 200}, {487, 163}};
+    int c_color = -1;
     float x = 0.6;
     float y = 0.5;
     float mult = 1.0001;
     int compteur = 0;
     sfColor color = {200, 200, 200, 100};
+    sfColor color_ball = {255, 255, 0, 255};
+    sfTexture *texture = make_brique(pos_brique);
 
     if (n != 2) {
         my_putstr("Please enter a difficulty (Easy, Hard, Lunatic)\n");
@@ -144,6 +164,7 @@ int main(int n, char **arg)
     else if (my_strcmp(arg[1], "Lunatic") == 0) {
         sfCircleShape_setFillColor(circle, color);
         mult += 0.0002;
+        c_color = 0;
     }
     else {
         my_putstr("Please enter a difficulty (Easy, Hard, Lunatic)\n");
@@ -153,6 +174,9 @@ int main(int n, char **arg)
     while (sfRenderWindow_isOpen(window)) {
         sfRenderWindow_clear(window, sfBlack);
         sfRenderWindow_drawSprite(window, background, NULL);
+        color_ball = change_color(color_ball, c_color);
+        if (c_color == 1 || c_color == -1)
+            sfCircleShape_setFillColor(circle, color_ball);
         sfCircleShape_setPosition(circle, move);
         sfCircleShape_setPosition(circle2, move);
         sfSprite_setPosition(bat, position);
@@ -163,28 +187,22 @@ int main(int n, char **arg)
         sfRenderWindow_drawCircleShape(window, circle2, NULL);
         sfRenderWindow_display(window);
         if (begin == 1) {
-            (sens_x == 0) ? (move.x += x) : (move.x -= x);
-            (sens_y == 0) ? (move.y += y) : (move.y -= y);
-            (move.y > 967 - 14 - 30 && position.x > move.x - 85 && position.x < move.x + 85) ? (sens_y = 1, compteur++) : sens_y;
+            (sens[0] == -1) ? (move.x += x) : (move.x -= x);
+            (sens[1] == -1) ? (move.y += y) : (move.y -= y);
+            (move.y > 967 - 14 - 30 && position.x > move.x - 85 && position.x < move.x + 85) ? (sens[1] = 1, compteur++) : sens[1];
             (move.y > 967 - 14) ? (sfRenderWindow_close(window)) : move.x;
-            (move.y < 14 + 50 && move.x < 192 && brique[0] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 0, 0), brique[0] = 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 192 && move.x < 384 && brique[1] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 192, 0), brique[1] = 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 384 && move.x < 576 && brique[2] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 384, 0), brique[2] = 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 576 && move.x < 768 && brique[3] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 576, 0), brique[3] = 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 768 && move.x < 960 && brique[4] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 768, 0), brique[4] = 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 960 && move.x < 1152 && brique[5] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 960, 0), brique[5] = 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 1152 && move.x < 1342 && brique[6] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 1152, 0), brique[6] = 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 1342 && move.x < 1531 && brique[7] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 1342, 0), brique[7]= 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 1531 && move.x < 1720 && brique[8] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 1531, 0), brique[8] = 1, sens_y = 0) : move.y;
-            (move.y < 14 + 50 && move.x > 1720 && brique[9] == 0) ? (sfTexture_updateFromPixels(texture, fb2->pixel, 193, 51, 1720, 0), brique[9] = 1, sens_y = 0) : move.y;
-            (move.y < 14) ? (sens_y = 0) : sens_y;
-            (move.x < 14) ? (sens_x = 0) : sens_x;
-            (move.x > 1915 - 14) ? (sens_x = 1) : sens_x;
+            
+            for (int i = 0; i != 12; i++)
+                touch_brique(move, texture, brique, sens, i, pos_brique);
+            
+            (move.y < 14) ? (sens[1] = -1) : sens[1];
+            (move.x < 14) ? (sens[0] = -1) : sens[0];
+            (move.x > 1915 - 14) ? (sens[0] = 1) : sens[0];
             
             x *= mult;
             y *= mult;
         } else {
-            move.x = event.mouseMove.x;
+            move.x = position.x;
             x = 0.6;
             y = 0.5;
         }
@@ -198,6 +216,8 @@ int main(int n, char **arg)
                     position.x -= 25;
                 else if (event.key.code == sfKeyEscape)
                     sfSprite_setColor(bat, sfTransparent);
+                else if (event.key.code == sfKeyC)
+                    c_color *= -1;
             if (event.type == sfEvtMouseMoved)
                 if (event.mouseMove.x > 1825)
                     position.x = 1825;

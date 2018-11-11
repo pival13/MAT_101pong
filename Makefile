@@ -19,7 +19,6 @@ all: $(NAME)
 $(NAME):
 	make -C./lib/my && make clean -C./lib/my
 	$(CC) -g -o $(NAME) $(SRC) -lm -L./lib/my -lmy -I./include/
-	$(CC) -o game bonus/moved_picture.c -lcsfml-graphics -Llib/my -lmy -Iinclude
 
 clean:
 	make clean -C./lib/my
@@ -29,6 +28,9 @@ fclean: clean
 	make fclean -C./lib/my
 	rm -f $(NAME) game
 
-re:	fclean all
+bonus:	
+	$(CC) -o game bonus/breakout_c.c -lcsfml-graphics -Llib/my -lmy -Iinclude
 
-.PHONY: all clean fclean
+re:	fclean all bonus
+
+.PHONY: all clean fclean bonus
