@@ -2,24 +2,27 @@
 ** EPITECH PROJECT, 2018
 ** my_getnbr.c
 ** File description:
-** str to int
+** Convert a str number into an int
 */
 
-int my_getnbr(char *toconvert)
+int my_getnbr(char const *str)
 {
-    int number = 0;
-    int mult = 1;
-    int i = 0;
-    int negative = 0;
+    int n = 0;
+    int neg = 0;
+    int nb = 0;
 
-    if (toconvert[0] == '-') {
-        toconvert++;
-        negative = 1;
+    while (str[n] == '-' || str[n] == '+') {
+        if (str[n] == '-') {
+            neg += 1;
+        }
+        n += 1;
     }
-    for (i = 0; toconvert[i] != 0; i++);
-    for (i--; i >= 0; i--, mult *= 10)
-        number += (toconvert[i] - 48) * mult;
-    if (negative == 1)
-        number *= (-1);
-    return (number);
+    while (str[n] <= '9' && str[n] >= '0') {
+        nb = nb * 10 + (str[n] - 48);
+        n += 1;
+    }
+    if (neg % 2 == 1) {
+        nb *= -1;
+    }
+    return (nb);
 }
