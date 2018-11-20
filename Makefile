@@ -29,7 +29,7 @@ fclean: clean
 	rm -f $(NAME) game
 
 bonus:	
-	$(CC) -o game bonus/breakout_c.c -lcsfml-graphics -lcsfml-audio -Llib/my -lmy -Iinclude
+	$(CC) -o game bonus/breakout_csfml/breakout_c.c -lcsfml-graphics -lcsfml-audio -Llib/my -lmy -Iinclude
 
 re:	fclean all bonus
 
